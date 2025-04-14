@@ -62,7 +62,7 @@
     "@oslojs/crypto": "1.0.1",
     "@oslojs/encoding": "1.1.0",
     "@types/node": "22.14.1",
-    "@virtual-live-lab/eslint-config": "2.2.19",
+    "@virtual-live-lab/eslint-config": "2.2.21",
     "@virtual-live-lab/prettier-config": "2.0.19",
     "@virtual-live-lab/tsconfig": "2.1.19",
     "@vitest/coverage-v8": "3.0.9",
