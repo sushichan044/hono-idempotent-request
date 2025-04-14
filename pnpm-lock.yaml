@@ -27,8 +27,8 @@ importers:
         specifier: 2.0.19
         version: 2.0.19(prettier@3.5.3)
       '@virtual-live-lab/tsconfig':
-        specifier: 2.1.19
-        version: 2.1.19(typescript@5.8.3)
+        specifier: 2.1.20
+        version: 2.1.20(typescript@5.8.3)
       '@vitest/coverage-v8':
         specifier: 3.0.9
         version: 3.0.9(vitest@3.0.9(@types/node@22.14.1)(jiti@2.4.2)(tsx@4.19.3)(yaml@2.7.1))
@@ -1336,8 +1336,8 @@ packages:
       prettier-plugin-astro:
         optional: true
 
-  '@virtual-live-lab/tsconfig@2.1.19':
-    resolution: {integrity: sha512-qUNaluUVX5EP+ks5+9C38AIKCm1PMB71FTlTwgF+N0sxMaGrLnF5gl+PhTggv8/3KlZSvM+kAOxaDq1pu7aehg==}
+  '@virtual-live-lab/tsconfig@2.1.20':
+    resolution: {integrity: sha512-hACjT2pdyNgvqpQIhWJzKrTI+SQQzwTZJirob2r0ctnwOialUyE6cqk+nvw/vFs96nnxY0K3BtNwc93dtnBC6A==}
     peerDependencies:
       typescript: ^5.0.0
 
@@ -4480,7 +4480,7 @@ snapshots:
       defu: 6.1.4
       prettier: 3.5.3
 
-  '@virtual-live-lab/tsconfig@2.1.19(typescript@5.8.3)':
+  '@virtual-live-lab/tsconfig@2.1.20(typescript@5.8.3)':
     dependencies:
       typescript: 5.8.3
 
