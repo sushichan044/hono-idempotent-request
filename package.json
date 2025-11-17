@@ -48,6 +48,9 @@
     "pkg-pr-new": "pkg-pr-new publish --compact --comment=update --pnpm"
   },
   "packageManager": "pnpm@10.22.0",
+  "peerDependencies": {
+    "hono": "^4.6.10"
+  },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:dev",
     "@biomejs/biome": "catalog:dev",
@@ -55,8 +58,10 @@
     "@typescript/native-preview": "catalog:dev",
     "@virtual-live-lab/eslint-config": "catalog:dev",
     "@virtual-live-lab/tsconfig": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:dev",
     "eslint": "catalog:dev",
     "eslint-plugin-import-access": "catalog:dev",
+    "hono": "4.10.6",
     "pkg-pr-new": "catalog:dev",
     "publint": "catalog:dev",
     "release-it": "catalog:dev",

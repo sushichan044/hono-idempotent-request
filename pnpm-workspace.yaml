@@ -6,6 +6,7 @@ catalogs:
     '@typescript/native-preview': 7.0.0-dev.20251117.1
     '@virtual-live-lab/eslint-config': ^2.3.1
     '@virtual-live-lab/tsconfig': ^2.1.21
+    '@vitest/coverage-v8': ^4.0.10
     eslint: ^9.39.1
     eslint-plugin-import-access: ^3.1.0
     pkg-pr-new: ^0.0.60
