@@ -1,0 +1,71 @@
+{
+  "name": "hono-idempotent-request",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "",
+  "sideEffects": false,
+  "license": "",
+  "keywords": [],
+  "homepage": "https://github.com/sushichan044/hono-idempotent-request#readme",
+  "bugs": {
+    "url": "https://github.com/sushichan044/hono-idempotent-request/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sushichan044/hono-idempotent-request.git"
+  },
+  "author": {
+    "name": "sushichan044",
+    "url": "https://github.com/sushichan044"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "funding": "https://github.com/sponsors/sushichan044",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "lint": "eslint --max-warnings 0 --fix",
+    "lint:check": "eslint --max-warnings 0",
+    "format": "biome format --write",
+    "format:check": "biome format --reporter=github",
+    "typecheck": "tsgo --noEmit",
+    "test": "vitest --run",
+    "check": "pnpm run format:check && pnpm run typecheck && pnpm run lint:check && pnpm run test && pnpm run build",
+    "build": "tsdown",
+    "prepublishOnly": "pnpm run build",
+    "pkg-pr-new": "pkg-pr-new publish --compact --comment=update --pnpm"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:dev",
+    "@biomejs/biome": "catalog:dev",
+    "@types/node": "catalog:dev",
+    "@typescript/native-preview": "catalog:dev",
+    "@virtual-live-lab/eslint-config": "catalog:dev",
+    "@virtual-live-lab/tsconfig": "catalog:dev",
+    "eslint": "catalog:dev",
+    "eslint-plugin-import-access": "catalog:dev",
+    "pkg-pr-new": "catalog:dev",
+    "publint": "catalog:dev",
+    "release-it": "catalog:dev",
+    "release-it-pnpm": "catalog:dev",
+    "tsdown": "catalog:dev",
+    "typescript": "catalog:dev",
+    "typescript-eslint": "catalog:dev",
+    "unplugin-unused": "catalog:dev",
+    "vite": "catalog:dev",
+    "vitest": "catalog:dev"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/release-it@18/schema/release-it.json",
+  "git": {
+    "commitMessage": "chore: release ${version}"
+  },
+  "plugins": {
+    "release-it-pnpm": {
+      "inFile": "CHANGELOG.md"
+    }
+  }
+}
