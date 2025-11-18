@@ -1,6 +1,6 @@
 # hono-idempotent-request
 
-Idempotent request middleware for [Hono](https://hono.dev/), compliant with [IETF draft-ietf-httpapi-idempotency-key-header-06](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/).
+Idempotent request middleware for [Hono](https://hono.dev/), compliant with [IETF draft-ietf-httpapi-idempotency-key-header-07](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07).
 
 ## Features
 
