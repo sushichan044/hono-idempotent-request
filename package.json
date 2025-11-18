@@ -59,7 +59,7 @@
   },
   "packageManager": "pnpm@10.22.0",
   "peerDependencies": {
-    "hono": "^4.6.10"
+    "hono": "^4.0.0"
   },
   "dependencies": {
     "structured-headers": "2.0.2"
