@@ -54,6 +54,8 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:dev",
     "@biomejs/biome": "catalog:dev",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
     "@types/node": "catalog:dev",
     "@typescript/native-preview": "catalog:dev",
     "@virtual-live-lab/eslint-config": "catalog:dev",
@@ -70,6 +72,7 @@
     "typescript": "catalog:dev",
     "typescript-eslint": "catalog:dev",
     "unplugin-unused": "catalog:dev",
+    "uuid": "^13.0.0",
     "vite": "catalog:dev",
     "vitest": "catalog:dev"
   }
