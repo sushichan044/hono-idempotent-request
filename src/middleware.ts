@@ -21,6 +21,7 @@ import { cloneAndSerializeResponse, deserializeResponse } from "./serializer";
 import { createIdempotentRequestServer } from "./server";
 import { createIdempotentRequestStorage } from "./storage";
 import { prepareActivationStrategy } from "./strategy";
+import { parseStructuredIdempotencyKey } from "./utils/structured-headers";
 
 export interface IdempotentRequestImplementation {
   /**
@@ -93,8 +94,17 @@ export function idempotentRequest(
       return await next();
     }
 
-    const idempotencyKey = c.req.header("Idempotency-Key");
-    if (idempotencyKey == null || !server.satisfiesKeySpec(idempotencyKey)) {
+    const rawIdempotencyKey = c.req.header("Idempotency-Key");
+    // nullish / empty is treated as missing key
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!rawIdempotencyKey) {
+      return await hooks.modifyResponse(
+        deserializeResponse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE),
+        "key_missing",
+      );
+    }
+    const idempotencyKey = parseStructuredIdempotencyKey(rawIdempotencyKey);
+    if (!server.satisfiesKeySpec(idempotencyKey)) {
       return await hooks.modifyResponse(
         deserializeResponse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE),
         "key_missing",
