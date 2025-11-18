@@ -3,10 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "",
+  "description": "Idempotent request middleware for Hono, compliant with IETF draft-ietf-httpapi-idempotency-key-header-06",
   "sideEffects": false,
-  "license": "",
-  "keywords": [],
+  "license": "MIT",
+  "keywords": [
+    "hono",
+    "middleware",
+    "idempotent",
+    "idempotency",
+    "idempotency-key",
+    "ietf",
+    "http",
+    "api",
+    "rest"
+  ],
   "homepage": "https://github.com/sushichan044/hono-idempotent-request#readme",
   "bugs": {
     "url": "https://github.com/sushichan044/hono-idempotent-request/issues"
