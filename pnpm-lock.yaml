@@ -67,6 +67,10 @@ catalogs:
 importers:
 
   .:
+    dependencies:
+      structured-headers:
+        specifier: 2.0.2
+        version: 2.0.2
     devDependencies:
       '@arethetypeswrong/core':
         specifier: catalog:dev
@@ -3363,6 +3367,10 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  structured-headers@2.0.2:
+    resolution: {integrity: sha512-IUul56vVHuMg2UxWhwDj9zVJE6ztYEQQkynr1FQ/NydPhivtk5+Qb2N1RS36owEFk2fNUriTguJ2R7htRObcdA==}
+    engines: {node: '>=18', npm: '>=6'}
 
   sucrase@3.35.0:
     resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==}
@@ -7345,6 +7353,8 @@ snapshots:
   strip-final-newline@4.0.0: {}
 
   strip-json-comments@3.1.1: {}
+
+  structured-headers@2.0.2: {}
 
   sucrase@3.35.0:
     dependencies:

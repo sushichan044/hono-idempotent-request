@@ -61,6 +61,9 @@
   "peerDependencies": {
     "hono": "^4.6.10"
   },
+  "dependencies": {
+    "structured-headers": "2.0.2"
+  },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:dev",
     "@biomejs/biome": "catalog:dev",
