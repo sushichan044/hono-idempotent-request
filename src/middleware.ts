@@ -4,8 +4,8 @@ import { createMiddleware } from "hono/factory";
 
 import type { Hooks } from "./hooks";
 import type { UnProcessedIdempotentRequest } from "./idempotent-request";
-import type { IdempotentRequestServerSpecification } from "./server/specification";
-import type { IdempotentRequestStorageAdapter } from "./storage/adapter";
+import type { IdempotentRequestServerSpecification } from "./server/types";
+import type { IdempotentRequestStorageAdapter } from "./storage/types";
 import type { IdempotencyActivationStrategy } from "./strategy";
 
 import { cloneRequest } from "./clone-request";

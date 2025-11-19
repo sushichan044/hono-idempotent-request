@@ -1,6 +1,6 @@
 import type { StorageKey } from "../brand";
 import type { RequestIdentifier } from "../identifier";
-import type { IdempotentRequestServerSpecification } from "./specification";
+import type { IdempotentRequestServerSpecification } from "./types";
 
 import { createIdempotencyFingerprint, createStorageKey } from "../brand";
 

@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { IdempotentRequestServerSpecification } from "./server/specification";
-import type { IdempotentRequestStorageAdapter } from "./storage/adapter";
+import type { IdempotentRequestServerSpecification } from "./server/types";
+import type { IdempotentRequestStorageAdapter } from "./storage/types";
 
 import { createInMemoryAdapter } from "../tests/utils/in-memory-adapter";
 import { createRacer, racerMiddleware } from "../tests/utils/racer";

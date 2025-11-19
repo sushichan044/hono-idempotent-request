@@ -6,7 +6,7 @@ import type {
   UnProcessedIdempotentRequest,
 } from "../idempotent-request";
 import type { SerializedResponse } from "../serializer";
-import type { IdempotentRequestStorageAdapter } from "./adapter";
+import type { IdempotentRequestStorageAdapter } from "./types";
 
 import { IdempotencyKeyStorageError } from "../error";
 
