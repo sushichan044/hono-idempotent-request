@@ -45,13 +45,13 @@ describe("idempotentRequest Middleware", () => {
     return app;
   }
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe("Happy path", () => {
     const memoryAdapter = createInMemoryAdapter();
     const adapterSaveSpy = vi.spyOn(memoryAdapter, "save");
-
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
 
     it("should process request successfully with valid Idempotency-Key", async () => {
       const app = createTestApp({ storageAdapter: memoryAdapter });
