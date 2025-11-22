@@ -6,32 +6,30 @@ import type { IdempotentRequestServerSpecification } from "./server/types";
 import type { IdempotentRequestStorageAdapter } from "./storage/types";
 
 import { createInMemoryAdapter } from "../tests/utils/in-memory-adapter";
-import { createRacer, racerMiddleware } from "../tests/utils/racer";
 import { createTestServerSpecification } from "../tests/utils/server-specification";
 import { idempotentRequest } from "./middleware";
 
 describe("idempotentRequest Middleware", () => {
   function createTestApp(options?: {
-    serverSpecification?: IdempotentRequestServerSpecification;
-    storageAdapter?: IdempotentRequestStorageAdapter;
+    spec?: IdempotentRequestServerSpecification;
+    storage?: IdempotentRequestStorageAdapter;
   }) {
     const {
-      serverSpecification = createTestServerSpecification(),
-      storageAdapter = createInMemoryAdapter(),
+      spec = createTestServerSpecification(),
+      storage = createInMemoryAdapter(),
     } = options ?? {};
 
     const app = new Hono()
       .use(
         "*",
         idempotentRequest({
-          activationStrategy: (request) => {
-            return ["PATCH", "POST"].includes(request.method);
-          },
+          activationStrategy: (request) =>
+            ["PATCH", "POST"].includes(request.method),
           server: {
-            specification: serverSpecification,
+            specification: spec,
           },
           storage: {
-            adapter: storageAdapter,
+            adapter: storage,
           },
         }),
       )
@@ -46,7 +44,7 @@ describe("idempotentRequest Middleware", () => {
   }
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe("Happy path", () => {
@@ -54,7 +52,7 @@ describe("idempotentRequest Middleware", () => {
     const adapterSaveSpy = vi.spyOn(memoryAdapter, "save");
 
     it("should process request successfully with valid Idempotency-Key", async () => {
-      const app = createTestApp({ storageAdapter: memoryAdapter });
+      const app = createTestApp({ storage: memoryAdapter });
 
       const response = await app.request("/api/test", {
         body: JSON.stringify({ name: "Edison" }),
@@ -71,7 +69,7 @@ describe("idempotentRequest Middleware", () => {
     });
 
     it("should return cached response on subsequent requests with same Idempotency-Key", async () => {
-      const app = createTestApp({ storageAdapter: memoryAdapter });
+      const app = createTestApp({ storage: memoryAdapter });
       const idempotencyKey = uuidv4();
 
       const createRequest = () => ({
@@ -142,6 +140,70 @@ describe("idempotentRequest Middleware", () => {
       });
     });
 
+    it("should handle concurrent requests with same Idempotency-Key", async () => {
+      const memoryAdapter = createInMemoryAdapter();
+      const waitOnServer = 100; //ms
+      const waitOnClient = waitOnServer / 2;
+      const sleep = async (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+
+      const app = new Hono<{ Bindings: { simulateSlow: boolean } }>()
+        .use(
+          "*",
+          idempotentRequest({
+            activationStrategy: (request) => {
+              return ["PATCH", "POST"].includes(request.method);
+            },
+            server: {
+              specification: createTestServerSpecification(),
+            },
+            storage: {
+              adapter: memoryAdapter,
+            },
+          }),
+          async (c, next) => {
+            if (c.env.simulateSlow) {
+              await sleep(waitOnServer);
+            }
+            return await next();
+          },
+        )
+        .post("/api/test", (c) => {
+          return c.json({ message: "Test passed" });
+        });
+      const idempotencyKey = uuidv4();
+
+      const createRequest = () =>
+        new Request("http://localhost/api/test", {
+          body: JSON.stringify({ name: "Edison" }),
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key": idempotencyKey,
+          },
+          method: "POST",
+        });
+
+      const firstSlowRequest = async () => {
+        return await app.request(createRequest(), undefined, {
+          simulateSlow: true,
+        });
+      };
+      const secondRequest = async () => {
+        await sleep(waitOnClient);
+        return await app.request(createRequest(), undefined, {
+          simulateSlow: false,
+        });
+      };
+
+      const [successResponse, conflictResponse] = await Promise.all([
+        firstSlowRequest(),
+        secondRequest(),
+      ]);
+
+      expect(successResponse.status).toBe(200);
+      expect(conflictResponse.status).toBe(409);
+    });
+
     it("should return 422 if Idempotency-Key is reused with different request payload", async () => {
       const app = createTestApp();
       const idempotencyKey = uuidv4();
@@ -176,92 +238,13 @@ describe("idempotentRequest Middleware", () => {
         title: "Idempotency-Key is already used",
       });
     });
-
-    it.skip("should handle concurrent requests with same Idempotency-Key", async () => {
-      const memoryAdapter = createInMemoryAdapter();
-      const racer = createRacer({
-        concurrency: 2,
-        totalDelayOnServer: 100,
-      });
-
-      const app = new Hono();
-
-      app.use(
-        "*",
-        racerMiddleware({
-          activation: (request) =>
-            request.headers.get("X-Simulate-Slow") === "true",
-          racer,
-        }),
-      );
-
-      app.use(
-        "*",
-        idempotentRequest({
-          activationStrategy: (request) => {
-            return ["PATCH", "POST"].includes(request.method);
-          },
-          server: {
-            specification: createTestServerSpecification(),
-          },
-          storage: {
-            adapter: memoryAdapter,
-          },
-        }),
-      );
-
-      app.post("/api/test", (c) => {
-        return c.json({ message: "Test passed" });
-      });
-
-      const idempotencyKey = uuidv4();
-
-      const createRequest = (headers: Record<string, string> = {}) => ({
-        body: JSON.stringify({ name: "John" }),
-        headers: {
-          ...headers,
-          "Content-Type": "application/json",
-          "Idempotency-Key": idempotencyKey,
-        },
-        method: "POST" as const,
-      });
-
-      const firstSlowRequest = async () =>
-        await app.request(
-          "/api/test",
-          createRequest({
-            "X-Simulate-Slow": "true",
-          }),
-        );
-
-      const secondRequest = async () => {
-        // Wait for first request to pass through racer middleware and acquire lock
-        // First request waits 50ms in racer, so we wait a bit more to ensure it has acquired the lock
-        await new Promise((resolve) => setTimeout(resolve, 55));
-        return await app.request("/api/test", createRequest());
-      };
-
-      const [successResponse, conflictResponse] = await Promise.all([
-        firstSlowRequest(),
-        secondRequest(),
-      ]);
-
-      expect(successResponse.status).toBe(200);
-      expect(conflictResponse.status).toBe(409);
-      const json = await conflictResponse.json();
-      expect(json).toMatchObject({
-        detail:
-          "A request with the same Idempotency-Key for the same operation is being processed or is outstanding.",
-        title: "A request is outstanding for this Idempotency-Key",
-      });
-    });
   });
 
   describe("Error handling", () => {
     it("should cache the error response", async () => {
       const memoryAdapter = createInMemoryAdapter();
       const adapterSaveSpy = vi.spyOn(memoryAdapter, "save");
-      const app = createTestApp({ storageAdapter: memoryAdapter });
+      const app = createTestApp({ storage: memoryAdapter });
 
       const request = {
         headers: {
@@ -285,7 +268,7 @@ describe("idempotentRequest Middleware", () => {
   describe("Unsafe implementation detection", () => {
     it("should throw an error if the storage key does not include the Idempotency-Key header", async () => {
       const app = createTestApp({
-        serverSpecification: {
+        spec: {
           getFingerprint: () => null,
           getStorageKey: () => "",
           satisfiesKeySpec: () => true,
