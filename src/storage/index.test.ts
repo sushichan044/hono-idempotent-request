@@ -31,6 +31,7 @@ describe("createIdempotentRequestStorage", () => {
   const storage = createIdempotentRequestStorage(fakeAdapter);
 
   const baseRequest: UnProcessedIdempotentRequest = {
+    createdAt: new Date("2024-01-01T00:00:00.000Z"),
     fingerprint: null,
     idempotencyKey: "cd4e21a0-f506-4ca3-a825-522a28bf7165",
     lockedAt: null,

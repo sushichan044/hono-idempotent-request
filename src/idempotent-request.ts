@@ -10,6 +10,11 @@ export type IdempotentRequestBase = Readonly<
      * This is used to retrieve the request from the storage.
      */
     storageKey: StorageKey;
+
+    /**
+     * Creation time of the request record
+     */
+    createdAt: Date;
   }
 >;
 

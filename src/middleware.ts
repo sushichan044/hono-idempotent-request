@@ -128,6 +128,7 @@ export function idempotentRequest(
 
     const storeResult = await storage.findOrCreate({
       ...requestIdentifier,
+      createdAt: new Date(),
       storageKey,
     });
 
