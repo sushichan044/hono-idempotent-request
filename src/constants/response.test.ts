@@ -16,7 +16,7 @@ describe("Error Response Constants", () => {
       ) as Record<string, unknown>;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 
@@ -26,7 +26,7 @@ describe("Error Response Constants", () => {
       ) as Record<string, unknown>;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 
@@ -36,7 +36,7 @@ describe("Error Response Constants", () => {
       ) as Record<string, unknown>;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 
@@ -104,9 +104,10 @@ describe("Error Response Constants", () => {
 
       expect(response.headers).toHaveProperty("Link");
       expect(response.headers["Link"]).toContain(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
-      expect(response.headers["Link"]).toContain('rel="help"');
+      expect(response.headers["Link"]).toContain('rel="describedby"');
+      expect(response.headers["Link"]).toContain('type="text/html"');
     });
 
     it("should have correct content type", () => {

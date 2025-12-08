@@ -32,7 +32,7 @@ const DEFAULT_SECTIONS: DocumentationSections = {
  * Default base URL for RFC documentation
  */
 const DEFAULT_BASE_URL =
-  "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06";
+  "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07";
 
 /**
  * Create a documentation configuration

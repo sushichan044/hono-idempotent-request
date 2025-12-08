@@ -10,7 +10,7 @@ describe("Documentation Configuration", () => {
     it("should create config with default URL", () => {
       const config = createDocumentationConfig();
       expect(config.baseUrl).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07",
       );
     });
 
@@ -37,7 +37,7 @@ describe("Documentation Configuration", () => {
       const config = createDocumentationConfig();
       const url = getDocumentationUrl(config, "keyMissing");
       expect(url).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 
@@ -45,7 +45,7 @@ describe("Documentation Configuration", () => {
       const config = createDocumentationConfig();
       const url = getDocumentationUrl(config, "keyConflict");
       expect(url).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 
@@ -53,7 +53,7 @@ describe("Documentation Configuration", () => {
       const config = createDocumentationConfig();
       const url = getDocumentationUrl(config, "keyMismatch");
       expect(url).toBe(
-        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7",
+        "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
       );
     });
 

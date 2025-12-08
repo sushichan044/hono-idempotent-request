@@ -1,5 +1,5 @@
 /**
- * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7}
  */
 
 import type {
@@ -48,7 +48,7 @@ export function createEnhancedErrorResponse(
     }),
     headers: {
       "Content-Type": "application/problem+json",
-      Link: `<${documentationUrl}>; rel="help"`,
+      Link: `<${documentationUrl}>; rel="describedby"; type="text/html"`,
     },
     status,
     statusText,
@@ -61,7 +61,7 @@ export function createEnhancedErrorResponse(
  * with an HTTP 400 status code with body containing a link pointing to
  * relevant documentation.
  *
- * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7}
  */
 export const IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE =
   createEnhancedErrorResponse(
@@ -78,7 +78,7 @@ export const IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE =
  * processed, the resource SHOULD reply with an HTTP 409 status code
  * with body containing problem description.
  *
- * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7}
  */
 export const IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE =
   createEnhancedErrorResponse(
@@ -95,7 +95,7 @@ export const IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE =
  * request payload, the resource SHOULD reply with a HTTP 422 status
  * code with body containing a link pointing to relevant documentation.
  *
- * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-06#section-2.7}
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7}
  */
 export const IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE =
   createEnhancedErrorResponse(

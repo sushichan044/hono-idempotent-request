@@ -13,6 +13,10 @@ type IdempotencyActivationStrategyFunction = (
 
 /**
  * Strategy for activating idempotency processing
+ *
+ * - "always": Always require Idempotency-Key header (compliant with draft-07)
+ * - "opt-in-with-key": Only apply idempotency when header is present (backward compatible)
+ * - Function: Custom logic for activation
  */
 export type IdempotencyActivationStrategy =
   | "always"
