@@ -9,19 +9,23 @@ import { parseItem, serializeItem } from "structured-headers";
  *
  * @see {@link https://datatracker.ietf.org/doc/html/rfc8941#section-3.3.3 3.3.3. Strings - RFC8941}
  *
- * @param rawIdempotencyKey - The raw Idempotency-Key header value.
+ * @param rawIdempotencyKey
+ *  The raw Idempotency-Key header value.
+ *  `null` means the value is invalid and could not be parsed.
+ *
  * @returns The parsed Idempotency-Key value.
  */
 export function parseStructuredIdempotencyKey(
   rawIdempotencyKey: string,
-): string {
-  const [parsed] = parseItem(serializeItem(rawIdempotencyKey));
+): string | null {
+  try {
+    const [parsed] = parseItem(serializeItem(rawIdempotencyKey));
+    if (typeof parsed === "string") {
+      return parsed;
+    }
 
-  if (typeof parsed !== "string") {
-    throw new Error(
-      "IdempotencyKey does not fit the String Item format of Structured Headers.",
-    );
+    return null;
+  } catch {
+    return null;
   }
-
-  return parsed;
 }

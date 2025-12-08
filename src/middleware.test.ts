@@ -138,6 +138,69 @@ describe("idempotentRequest Middleware", () => {
       });
     });
 
+    it("should return 400 for malformed Idempotency-Key header (parse error)", async () => {
+      const app = createTestApp();
+
+      const response = await app.request("/api/test", {
+        body: JSON.stringify({ name: "John" }),
+        headers: {
+          "Content-Type": "application/json",
+          // Invalid structured header - contains comma which has special meaning
+          "Idempotency-Key": "invalid,structured,header",
+        },
+        method: "POST",
+      });
+
+      expect(response.status).toBe(400);
+    });
+
+    it("should return 400 when Idempotency-Key is missing with default strategy", async () => {
+      // Test default strategy (not specifying activationStrategy)
+      const app = new Hono()
+        .use(
+          "*",
+          idempotentRequest({
+            // activationStrategy not specified - defaults to "always"
+            resource: createTestResource(),
+            storage: {
+              adapter: createInMemoryAdapter(),
+            },
+          }),
+        )
+        .post("/api/test", (c) => c.json({ ok: true }));
+
+      const response = await app.request("/api/test", {
+        body: JSON.stringify({ test: true }),
+        method: "POST",
+      });
+
+      expect(response.status).toBe(400);
+    });
+
+    it("should skip idempotency with opt-in-with-key strategy when header is missing", async () => {
+      const app = new Hono()
+        .use(
+          "*",
+          idempotentRequest({
+            activationStrategy: "opt-in-with-key",
+            resource: createTestResource(),
+            storage: {
+              adapter: createInMemoryAdapter(),
+            },
+          }),
+        )
+        .post("/api/test", (c) => c.json({ ok: true }));
+
+      const response = await app.request("/api/test", {
+        body: JSON.stringify({ test: true }),
+        method: "POST",
+      });
+
+      expect(response.status).toBe(200); // Middleware is skipped, normal processing
+      const json = await response.json();
+      expect(json).toMatchObject({ ok: true });
+    });
+
     it("should handle concurrent requests with same Idempotency-Key", async () => {
       const memoryAdapter = createInMemoryAdapter();
       const waitOnServer = 100; //ms

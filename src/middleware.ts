@@ -28,7 +28,7 @@ export interface IdempotentRequestImplementation {
    * Strategy for activating idempotency processing
    *
    * As a string:
-   * - `"always"`: Always apply idempotency processing
+   * - `"always"`: Always apply idempotency processing (default - compliant with draft-07)
    * - `"opt-in-with-key"`: Apply idempotency processing only if the `Idempotency-Key` header exists
    *
    * As a function:
@@ -37,7 +37,7 @@ export interface IdempotentRequestImplementation {
    *   - Useful when you are using strategies like feature flags
    *   - Return `true` to apply idempotency processing, `false` otherwise
    *
-   * @default "opt-in-with-key"
+   * @default "always"
    *
    * @example
    * ```ts
@@ -75,9 +75,7 @@ export interface IdempotentRequestImplementation {
 export function idempotentRequest(
   impl: IdempotentRequestImplementation,
 ): MiddlewareHandler {
-  const strategy = resolveStrategy(
-    impl.activationStrategy ?? "opt-in-with-key",
-  );
+  const strategy = resolveStrategy(impl.activationStrategy ?? "always");
   const hooks = resolveHooks(impl.hooks);
   const resource = createResource(impl.resource);
   const storage = createStorage(impl.storage.adapter);
@@ -98,7 +96,14 @@ export function idempotentRequest(
         "key_missing",
       );
     }
+
     const idempotencyKey = parseStructuredIdempotencyKey(rawIdempotencyKey);
+    if (idempotencyKey === null) {
+      return await hooks.modifyResponse(
+        deserializeResponse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE),
+        "key_missing",
+      );
+    }
     if (!resource.satisfiesKeySpec(idempotencyKey)) {
       return await hooks.modifyResponse(
         deserializeResponse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE),
