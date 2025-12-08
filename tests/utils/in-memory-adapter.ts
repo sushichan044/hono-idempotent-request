@@ -1,8 +1,4 @@
-import type {
-  IdempotentRequest,
-  IdempotentRequestStorageAdapter,
-  StorageKey,
-} from "../../src";
+import type { IdempotentRequest, StorageAdapter } from "../../src";
 
 const TTL_ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
@@ -12,8 +8,8 @@ const TTL_ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
  * This is a simple implementation that is not suitable for production use.
  * It is only meant to be used for testing purposes.
  */
-export const createInMemoryAdapter = (): IdempotentRequestStorageAdapter => {
-  const requests = new Map<StorageKey, IdempotentRequest>();
+export const createInMemoryAdapter = (): StorageAdapter => {
+  const requests = new Map<string, IdempotentRequest>();
 
   return {
     save(request) {

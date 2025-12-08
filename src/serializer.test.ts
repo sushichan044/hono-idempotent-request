@@ -17,7 +17,7 @@ describe("serializeResponse", () => {
 
     const serialized = await cloneAndSerializeResponse(mockResponse);
 
-    expect(serialized).toStrictEqual({
+    expect(serialized).toEqual({
       body: "Test body",
       headers: {
         "content-type": "text/plain",

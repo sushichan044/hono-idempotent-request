@@ -1,13 +1,7 @@
-export { createIdempotencyFingerprint, createStorageKey } from "./brand";
-export type { IdempotencyFingerprint, StorageKey } from "./brand";
-
 export { IdempotencyKeyStorageError, UnsafeImplementationError } from "./error";
-
 export type { IdempotentRequest } from "./idempotent-request";
-
 export { idempotentRequest } from "./middleware";
 export type { IdempotentRequestImplementation } from "./middleware";
-
+export type { ResourceSpecification } from "./resource";
 export type { SerializedResponse } from "./serializer";
-export type { IdempotentRequestServerSpecification } from "./server/types";
-export type { IdempotentRequestStorageAdapter } from "./storage/types";
+export type { StorageAdapter } from "./storage/types";

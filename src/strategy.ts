@@ -16,7 +16,7 @@ type IdempotencyActivationStrategyFunction = (
  */
 export type IdempotencyActivationStrategy =
   | "always"
-  | "opt-in"
+  | "opt-in-with-key"
   | IdempotencyActivationStrategyFunction;
 
 /**
@@ -28,14 +28,14 @@ export type IdempotencyActivationStrategy =
  * @param strategy The strategy.
  * @returns Function that returns a boolean indicating whether to apply idempotency processing.
  */
-export const prepareActivationStrategy = (
+export function resolveStrategy(
   strategy: IdempotencyActivationStrategy,
-): IdempotencyActivationStrategyFunction => {
+): IdempotencyActivationStrategyFunction {
   if (typeof strategy === "function") {
     return strategy;
   }
 
-  if (strategy === "opt-in") {
+  if (strategy === "opt-in-with-key") {
     return OPT_IN_WITH_KEY;
   }
 
@@ -46,13 +46,12 @@ export const prepareActivationStrategy = (
   throw new Error(
     `Invalid activation strategy: ${String(strategy satisfies never)}`,
   );
-};
+}
 
 /**
  * Strategy for always applying idempotency processing
  */
-const ALWAYS_ACTIVE = (() =>
-  true) satisfies IdempotencyActivationStrategyFunction;
+const ALWAYS_ACTIVE: IdempotencyActivationStrategyFunction = () => true;
 
 /**
  * Strategy for applying idempotency processing only if the Idempotency-Key header exists

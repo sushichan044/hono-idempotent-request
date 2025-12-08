@@ -1,27 +1,30 @@
 import type {
+  FulfilledIdempotentRequest,
   IdempotentRequest,
   IdempotentRequestBase,
-  ProcessedIdempotentRequest,
   ProcessingIdempotentRequest,
   UnProcessedIdempotentRequest,
 } from "../idempotent-request";
 import type { SerializedResponse } from "../serializer";
-import type { IdempotentRequestStorageAdapter } from "./types";
+import type { StorageAdapter } from "./types";
 
 import { IdempotencyKeyStorageError } from "../error";
 
 interface IdempotentRequestStorage {
   /**
-   * Acquire a lock for the request.
+   * Complete the request by setting the response and freeing the lock.
+   *
+   * This method internally clones the response, So you don't need to clone in caller side.
    *
    * @param request
-   * The request to acquire a lock for.
-   * @returns
-   * The locked request.
+   * The request to set the response and unlock.
+   * @param response
+   * The response to set.
    */
-  acquireLock(
-    request: UnProcessedIdempotentRequest,
-  ): Promise<ProcessingIdempotentRequest>;
+  completeRequestAndUnlock(
+    request: ProcessingIdempotentRequest,
+    response: SerializedResponse,
+  ): Promise<void>;
 
   /**
    * Find or create a request.
@@ -29,6 +32,9 @@ interface IdempotentRequestStorage {
    * @param request
    * The request to find or create.
    * @returns
+   *
+   * - If the request is found, returns `{ created: false, request: IdempotentRequest }`.
+   * - If the request is not found, persists a new unprocessed request and returns `{ created: true, request: UnProcessedIdempotentRequest }`.
    */
   findOrCreate(request: IdempotentRequestBase): Promise<
     | {
@@ -42,34 +48,34 @@ interface IdempotentRequestStorage {
   >;
 
   /**
-   * Set the response and unlock the request.
-   *
-   * This method internally clones the response, So you don't need to clone in caller side.
+   * Acquire a lock for the request.
    *
    * @param request
-   * The request to set the response and unlock.
-   * @param response
-   * The response to set.
+   * The request to acquire a lock for.
+   * @returns
+   * The locked request.
    */
-  setResponseAndUnlock(
-    request: ProcessingIdempotentRequest,
-    response: SerializedResponse,
-  ): Promise<void>;
+  lockRequest(
+    request: UnProcessedIdempotentRequest,
+  ): Promise<ProcessingIdempotentRequest>;
 }
 
-export const createIdempotentRequestStorage = (
-  adapter: IdempotentRequestStorageAdapter,
-): IdempotentRequestStorage => {
+/**
+ * @internal
+ */
+export function createStorage(
+  adapter: StorageAdapter,
+): IdempotentRequestStorage {
   return {
-    acquireLock: async (request) => {
+    lockRequest: async (request) => {
       try {
-        const lockedRequest = {
+        const locked: ProcessingIdempotentRequest = {
           ...request,
           lockedAt: new Date(),
-        } satisfies ProcessingIdempotentRequest;
-        await adapter.update(lockedRequest);
+        };
+        await adapter.update(locked);
 
-        return lockedRequest;
+        return locked;
       } catch (error) {
         throw new IdempotencyKeyStorageError(
           `Failed to acquire a lock for the stored idempotent request: ${request.storageKey}`,
@@ -90,16 +96,16 @@ export const createIdempotentRequestStorage = (
           };
         }
 
-        const nonLockedRequest = {
+        const pendingRequest: UnProcessedIdempotentRequest = {
           ...request,
           lockedAt: null,
           response: null,
-        } satisfies UnProcessedIdempotentRequest;
-        await adapter.save(nonLockedRequest);
+        };
+        await adapter.save(pendingRequest);
 
         return {
           created: true,
-          request: nonLockedRequest,
+          request: pendingRequest,
         };
       } catch (error) {
         throw new IdempotencyKeyStorageError(
@@ -111,15 +117,15 @@ export const createIdempotentRequestStorage = (
       }
     },
 
-    setResponseAndUnlock: async (request, response) => {
+    completeRequestAndUnlock: async (request, response) => {
       try {
-        const unlockedRequest = {
+        const fulfilledRequest: FulfilledIdempotentRequest = {
           ...request,
           lockedAt: null,
           response,
-        } satisfies ProcessedIdempotentRequest;
+        };
 
-        await adapter.update(unlockedRequest);
+        await adapter.update(fulfilledRequest);
       } catch (error) {
         throw new IdempotencyKeyStorageError(
           `Failed to save the response of an idempotent request: ${request.storageKey}. You should unlock the request manually.`,
@@ -130,4 +136,4 @@ export const createIdempotentRequestStorage = (
       }
     },
   };
-};
+}

@@ -24,14 +24,14 @@ export type RequestIdentifier = {
   fingerprint: IdempotencyFingerprint | null;
 };
 
-export const isIdenticalRequest = (
+export function isIdenticalRequest(
   target: RequestIdentifier,
   candidate: RequestIdentifier,
-): boolean => {
+): boolean {
   return (
     target.requestMethod === candidate.requestMethod &&
     target.requestPath === candidate.requestPath &&
     target.idempotencyKey === candidate.idempotencyKey &&
     target.fingerprint === candidate.fingerprint
   );
-};
+}

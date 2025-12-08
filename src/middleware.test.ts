@@ -2,21 +2,21 @@ import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { IdempotentRequestServerSpecification } from "./server/types";
-import type { IdempotentRequestStorageAdapter } from "./storage/types";
+import type { ResourceSpecification } from "./resource";
+import type { StorageAdapter } from "./storage/types";
 
 import { createInMemoryAdapter } from "../tests/utils/in-memory-adapter";
-import { createTestServerSpecification } from "../tests/utils/server-specification";
+import { createTestResource } from "../tests/utils/server-specification";
 import { idempotentRequest } from "./middleware";
 
 describe("idempotentRequest Middleware", () => {
   function createTestApp(options?: {
-    spec?: IdempotentRequestServerSpecification;
-    storage?: IdempotentRequestStorageAdapter;
+    spec?: ResourceSpecification;
+    storage?: StorageAdapter;
   }) {
     const {
-      spec = createTestServerSpecification(),
-      storage = createInMemoryAdapter(),
+      spec: resource = createTestResource(),
+      storage: adapter = createInMemoryAdapter(),
     } = options ?? {};
 
     const app = new Hono()
@@ -25,11 +25,9 @@ describe("idempotentRequest Middleware", () => {
         idempotentRequest({
           activationStrategy: (request) =>
             ["PATCH", "POST"].includes(request.method),
-          server: {
-            specification: spec,
-          },
+          resource,
           storage: {
-            adapter: storage,
+            adapter,
           },
         }),
       )
@@ -154,9 +152,7 @@ describe("idempotentRequest Middleware", () => {
             activationStrategy: (request) => {
               return ["PATCH", "POST"].includes(request.method);
             },
-            server: {
-              specification: createTestServerSpecification(),
-            },
+            resource: createTestResource(),
             storage: {
               adapter: memoryAdapter,
             },

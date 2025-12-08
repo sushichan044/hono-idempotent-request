@@ -19,7 +19,7 @@ export type IdempotentRequestBase = Readonly<
 >;
 
 export type IdempotentRequest =
-  | ProcessedIdempotentRequest
+  | FulfilledIdempotentRequest
   | ProcessingIdempotentRequest
   | UnProcessedIdempotentRequest;
 
@@ -49,7 +49,7 @@ export type ProcessingIdempotentRequest = IdempotentRequestBase &
     response: null;
   }>;
 
-export type ProcessedIdempotentRequest = IdempotentRequestBase &
+export type FulfilledIdempotentRequest = IdempotentRequestBase &
   Readonly<{
     /**
      * Time when the request was locked for processing

@@ -1,20 +1,20 @@
 import type { StorageKey } from "../brand";
 import type {
+  FulfilledIdempotentRequest,
   IdempotentRequest,
-  ProcessedIdempotentRequest,
   ProcessingIdempotentRequest,
   UnProcessedIdempotentRequest,
 } from "../idempotent-request";
 import type { Awaitable } from "../utils/types";
-
 /**
+ *
  * Adapter for storage of idempotent request records.
  *
  * You need to implement read/write process with specific persistence services.
  *
  * You can implement persistence policies like TTL at this layer.
  */
-export interface IdempotentRequestStorageAdapter {
+export interface StorageAdapter {
   /**
    * Get a stored request.
    *
@@ -40,6 +40,6 @@ export interface IdempotentRequestStorageAdapter {
    * The request to update.
    */
   update(
-    request: ProcessedIdempotentRequest | ProcessingIdempotentRequest,
+    request: FulfilledIdempotentRequest | ProcessingIdempotentRequest,
   ): Awaitable<void>;
 }

@@ -2,38 +2,29 @@ import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeHexLowerCase } from "@oslojs/encoding";
 import { version as uuidVersion } from "uuid";
 
-import type { IdempotentRequestServerSpecification } from "../../src";
+import type { ResourceSpecification } from "../../src";
 
-/**
- * Idempotent request server specification for testing purposes.
- *
- * This is a simple implementation that is not suitable for production use.
- * It is only meant to be used for testing purposes.
- *
- * - Idempotency-Key format: `uuidv4`
- */
-export const createTestServerSpecification =
-  (): IdempotentRequestServerSpecification => {
-    return {
-      getStorageKey({ idempotencyKey, request }) {
-        const path = new URL(request.url).pathname;
+export const createTestResource = (): ResourceSpecification => {
+  return {
+    getStorageKey({ idempotencyKey, request }) {
+      const path = new URL(request.url).pathname;
 
-        return `${request.method}-${path}-${idempotencyKey}`;
-      },
+      return `${request.method}-${path}-${idempotencyKey}`;
+    },
 
-      async getFingerprint(request) {
-        return await generateHash(request);
-      },
+    async getFingerprint(request) {
+      return await generateHash(request);
+    },
 
-      satisfiesKeySpec(idempotencyKey) {
-        try {
-          return uuidVersion(idempotencyKey) === 4;
-        } catch {
-          return false;
-        }
-      },
-    };
+    satisfiesKeySpec(idempotencyKey) {
+      try {
+        return uuidVersion(idempotencyKey) === 4;
+      } catch {
+        return false;
+      }
+    },
   };
+};
 
 /**
  * Hash function - Generate a hash from the request content

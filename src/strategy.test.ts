@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { IdempotencyActivationStrategy } from "./strategy";
 
-import { prepareActivationStrategy } from "./strategy";
+import { resolveStrategy } from "./strategy";
 
 const createMockRequest = (
   definedHeaders: Record<string, string> = {},
@@ -16,14 +16,14 @@ const createMockRequest = (
 
 describe("prepareActivationStrategy", () => {
   it("should return a function that always returns true when strategy is 'always'", async () => {
-    const strategy = prepareActivationStrategy("always");
+    const strategy = resolveStrategy("always");
     const request = createMockRequest();
 
     expect(await strategy(request)).toBe(true);
   });
 
-  it("should return a function that checks Idempotency-Key header when strategy is 'opt-in'", async () => {
-    const strategy = prepareActivationStrategy("opt-in");
+  it("should return a function that checks Idempotency-Key header when strategy is 'opt-in-with-key'", async () => {
+    const strategy = resolveStrategy("opt-in-with-key");
 
     const mockRequestWithoutKey = createMockRequest();
     const mockRequestWithEmptyKey = createMockRequest({
@@ -40,7 +40,7 @@ describe("prepareActivationStrategy", () => {
   });
 
   it("should return the function as is when strategy is a function", async () => {
-    const strategy = prepareActivationStrategy(
+    const strategy = resolveStrategy(
       (req) => req.headers.get("X-Enable-Idempotency") === "true",
     );
 
@@ -56,9 +56,7 @@ describe("prepareActivationStrategy", () => {
   it("should throw an error when strategy is invalid", () => {
     const invalidStrategy = "invalid-strategy";
     expect(() =>
-      prepareActivationStrategy(
-        invalidStrategy as IdempotencyActivationStrategy,
-      ),
+      resolveStrategy(invalidStrategy as IdempotencyActivationStrategy),
     ).toThrow(`Invalid activation strategy: ${invalidStrategy}`);
   });
 });

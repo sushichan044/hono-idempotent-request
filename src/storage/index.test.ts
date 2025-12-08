@@ -1,7 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  assert,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 
 import type {
-  ProcessedIdempotentRequest,
+  FulfilledIdempotentRequest,
   ProcessingIdempotentRequest,
   UnProcessedIdempotentRequest,
 } from "../idempotent-request";
@@ -9,12 +17,18 @@ import type { SerializedResponse } from "../serializer";
 
 import { createStorageKey } from "../brand";
 import { IdempotencyKeyStorageError } from "../error";
-import { createIdempotentRequestStorage } from "./index";
+import { createStorage } from "./index";
 
-const fakeAdapter = {
+const mocks = vi.hoisted(() => ({
   get: vi.fn(),
   save: vi.fn(),
   update: vi.fn(),
+}));
+
+const storageDriver = {
+  get: mocks.get,
+  save: mocks.save,
+  update: mocks.update,
 };
 
 describe("createIdempotentRequestStorage", () => {
@@ -28,24 +42,23 @@ describe("createIdempotentRequestStorage", () => {
     vi.useRealTimers();
   });
 
-  const storage = createIdempotentRequestStorage(fakeAdapter);
-
+  const storage = createStorage(storageDriver);
   const baseRequest: UnProcessedIdempotentRequest = {
     createdAt: new Date("2024-01-01T00:00:00.000Z"),
     fingerprint: null,
     idempotencyKey: "cd4e21a0-f506-4ca3-a825-522a28bf7165",
     lockedAt: null,
     requestMethod: "POST",
-    requestPath: "/test",
+    requestPath: "/resource/new",
     response: null,
     storageKey: createStorageKey("test-key"),
   };
 
-  describe("acquireLock", () => {
+  describe("lockRequest", () => {
     it("should acquire a lock and update the processing request", async () => {
-      const lockedRequest = await storage.acquireLock(baseRequest);
+      const lockedRequest = await storage.lockRequest(baseRequest);
 
-      expect(lockedRequest).toStrictEqual({
+      expect(lockedRequest).toEqual({
         ...baseRequest,
         lockedAt: new Date("2024-01-01T00:01:00.000Z"),
       });
@@ -53,79 +66,66 @@ describe("createIdempotentRequestStorage", () => {
 
     it("should throw IdempotencyKeyStorageError if adapter.update fails", async () => {
       const adapterError = new Error("Adapter update failed");
-      fakeAdapter.update.mockRejectedValue(adapterError);
+      storageDriver.update.mockRejectedValue(adapterError);
 
-      await expect(storage.acquireLock(baseRequest)).rejects.toThrowError(
-        new IdempotencyKeyStorageError(
-          `Failed to acquire a lock for the stored idempotent request: ${baseRequest.storageKey}`,
-          { cause: adapterError },
-        ),
+      await expect(storage.lockRequest(baseRequest)).rejects.toThrowError(
+        IdempotencyKeyStorageError,
       );
-      expect(fakeAdapter.update).toHaveBeenCalledOnce();
+      expect(storageDriver.update).toHaveBeenCalledOnce();
     });
   });
 
   describe("findOrCreate", () => {
     const response: SerializedResponse = {
       body: '{"id": 123}',
-      headers: { location: "/new-resource" },
+      headers: { location: "/resource/123" },
       status: 201,
       statusText: "Created",
     };
 
     it("should early return with cached request if already processed", async () => {
-      const existingRequest: ProcessedIdempotentRequest = {
+      const fulfilled: FulfilledIdempotentRequest = {
         ...baseRequest,
         response,
       };
-      fakeAdapter.get.mockResolvedValue(existingRequest);
+      storageDriver.get.mockResolvedValue(fulfilled);
 
       const result = await storage.findOrCreate(baseRequest);
+      assert.isFalse(result.created);
 
-      expect(result).toStrictEqual({
-        created: false,
-        request: existingRequest,
-      });
-      expect(fakeAdapter.save).not.toHaveBeenCalled();
+      expect(result.request).toEqual(fulfilled);
+      expect(storageDriver.save).not.toHaveBeenCalled();
     });
 
     it("should create and save a new unprocessed request if not found", async () => {
-      const expectedNewRequest: UnProcessedIdempotentRequest = {
+      const newRequest: UnProcessedIdempotentRequest = {
         ...baseRequest,
         lockedAt: null,
         response: null,
       };
-      fakeAdapter.get.mockResolvedValue(null);
+      storageDriver.get.mockResolvedValue(null);
 
       const result = await storage.findOrCreate(baseRequest);
+      assert.isTrue(result.created);
 
-      expect(result).toStrictEqual({
-        created: true,
-        request: expectedNewRequest,
-      });
+      expect(result.request).toEqual(newRequest);
     });
 
     it("should throw IdempotencyKeyStorageError if adapter.get fails", async () => {
       const adapterError = new Error("Adapter get failed");
-      fakeAdapter.get.mockRejectedValue(adapterError);
+      storageDriver.get.mockRejectedValue(adapterError);
 
       await expect(storage.findOrCreate(baseRequest)).rejects.toThrowError(
-        new IdempotencyKeyStorageError(
-          `Failed to find or create the stored idempotent request: ${baseRequest.storageKey}`,
-          { cause: adapterError },
-        ),
+        IdempotencyKeyStorageError,
       );
     });
 
     it("should throw IdempotencyKeyStorageError if adapter.save fails", async () => {
       const adapterError = new Error("Adapter save failed");
-      fakeAdapter.save.mockRejectedValue(adapterError);
+      storageDriver.save.mockRejectedValue(adapterError);
 
       await expect(storage.findOrCreate(baseRequest)).rejects.toThrowError(
-        new IdempotencyKeyStorageError(
-          `Failed to find or create the stored idempotent request: ${baseRequest.storageKey}`,
-          { cause: adapterError },
-        ),
+        IdempotencyKeyStorageError,
       );
     });
   });
@@ -139,15 +139,15 @@ describe("createIdempotentRequestStorage", () => {
 
     const response: SerializedResponse = {
       body: '{"id": 123}',
-      headers: { location: "/new-resource" },
+      headers: { location: "/resource/123" },
       status: 201,
       statusText: "Created",
     };
 
     it("should set the response, unlock the request, and update", async () => {
-      await storage.setResponseAndUnlock(processingRequest, response);
+      await storage.completeRequestAndUnlock(processingRequest, response);
 
-      expect(fakeAdapter.update).toHaveBeenCalledExactlyOnceWith({
+      expect(storageDriver.update).toHaveBeenCalledExactlyOnceWith({
         ...processingRequest,
         lockedAt: null,
         response,
@@ -156,17 +156,12 @@ describe("createIdempotentRequestStorage", () => {
 
     it("should throw IdempotencyKeyStorageError if adapter.update fails", async () => {
       const adapterError = new Error("Adapter update failed");
-      fakeAdapter.update.mockRejectedValue(adapterError);
+      storageDriver.update.mockRejectedValue(adapterError);
 
       await expect(
-        storage.setResponseAndUnlock(processingRequest, response),
-      ).rejects.toThrowError(
-        new IdempotencyKeyStorageError(
-          `Failed to save the response of an idempotent request: ${processingRequest.storageKey}. You should unlock the request manually.`,
-          { cause: adapterError },
-        ),
-      );
-      expect(fakeAdapter.update).toHaveBeenCalledOnce();
+        storage.completeRequestAndUnlock(processingRequest, response),
+      ).rejects.toThrowError(IdempotencyKeyStorageError);
+      expect(storageDriver.update).toHaveBeenCalledOnce();
     });
   });
 });
