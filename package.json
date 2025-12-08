@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Idempotent request middleware for Hono, compliant with IETF draft-ietf-httpapi-idempotency-key-header-06",
+  "description": "Idempotent request middleware for Hono, compliant with IETF draft-ietf-httpapi-idempotency-key-header-07",
   "sideEffects": false,
   "license": "MIT",
   "keywords": [
