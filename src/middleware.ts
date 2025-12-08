@@ -106,20 +106,20 @@ export function idempotentRequest(
       );
     }
 
-    const storageKey = await resource.getStorageKey({
+    const storageKey = await resource.getStorageKey(
       idempotencyKey,
-      request: await cloneRequest(c),
-    });
+      await cloneRequest(c),
+    );
     if (!storageKey.includes(idempotencyKey)) {
       throw new UnsafeImplementationError(
         "The storage-key must include the value of the `Idempotency-Key` header.",
       );
     }
 
-    const requestIdentifier = await resource.getRequestIdentifier({
+    const requestIdentifier = await resource.getRequestIdentifier(
       idempotencyKey,
-      request: await cloneRequest(c),
-    });
+      await cloneRequest(c),
+    );
 
     const storeResult = await storage.findOrCreate({
       ...requestIdentifier,

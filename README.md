@@ -27,8 +27,7 @@ yarn add hono-idempotent-request
 
 ## Requirements
 
-- Node.js >= 20.19.0
-- Hono >= 4.6.10
+- Hono >= 4.0.0
 
 ## Quick Start
 
@@ -38,26 +37,28 @@ import { idempotentRequest } from "hono-idempotent-request";
 
 const app = new Hono()
   .use(
-    "*",
+    "/api",
     idempotentRequest({
-      activationStrategy: (request) => {
-        return ["POST", "PATCH"].includes(request.method);
-      },
-      server: {
-        specification: {
-          satisfiesKeySpec: (key) => {
-            // Validate Idempotency-Key format
-            return key.length <= 255;
-          },
-          getStorageKey: (key, request) => {
-            // Generate a storage key
-            return createStorageKey(`${key}:${request.url}`);
-          },
-          getFingerprint: async (request) => {
-            // Generate a fingerprint for the request
-            const body = await request.clone().text();
-            return createIdempotencyFingerprint(body);
-          },
+      activationStrategy: (request) => ["POST", "PATCH"].includes(request.method),
+      // https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#name-resource
+      resource: {
+        satisfiesKeySpec: (key: string) => {
+          // Validate Idempotency-Key format.
+          // Other than this example, you can implement your own logic like UUID validation.
+          return key.length <= 255;
+        },
+        getStorageKey: (idempotencyKey: string, request: Request) => {
+          // Generate a storage key for the request.
+          // For better isolation / performance, you might want to include user identifiers or other context.
+          return `${idempotencyKey}:${request.url}`;
+        },
+        getFingerprint: async (request: Request) => {
+          // Generate a fingerprint for the request.
+          // If you want to use structured objects, you should normalize the order of keys to compare them by semantics.
+          const payload = await request.json();
+          return {
+            user: payload.userId,
+          };
         },
       },
       storage: {

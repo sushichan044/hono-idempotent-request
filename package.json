@@ -35,9 +35,6 @@
     "provenance": true
   },
   "funding": "https://github.com/sponsors/sushichan044",
-  "engines": {
-    "node": ">=20.19.0"
-  },
   "files": ["dist"],
   "exports": {
     ".": {

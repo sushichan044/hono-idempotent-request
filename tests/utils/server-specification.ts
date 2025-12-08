@@ -6,7 +6,7 @@ import type { ResourceSpecification } from "../../src";
 
 export const createTestResource = (): ResourceSpecification => {
   return {
-    getStorageKey({ idempotencyKey, request }) {
+    getStorageKey(idempotencyKey, request) {
       const path = new URL(request.url).pathname;
 
       return `${request.method}-${path}-${idempotencyKey}`;

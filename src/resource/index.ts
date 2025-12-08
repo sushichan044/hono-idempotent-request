@@ -41,7 +41,7 @@ export interface ResourceSpecification {
    * @returns
    * A key that is used to retrieve the request from the storage.
    */
-  getStorageKey(source: StorageKeySource): Awaitable<string>;
+  getStorageKey(idempotencyKey: string, request: Request): Awaitable<string>;
 
   /**
    * Check if the idempotency key satisfies the resource-defined specifications.
@@ -65,12 +65,12 @@ export function createResource(
   spec: ResourceSpecification,
 ): IdempotentRequestResource {
   return {
-    getStorageKey: async (source) => {
-      const storageKey = await spec.getStorageKey(source);
+    getStorageKey: async (idempotencyKey, request) => {
+      const storageKey = await spec.getStorageKey(idempotencyKey, request);
       return createStorageKey(storageKey);
     },
 
-    getRequestIdentifier: async ({ idempotencyKey, request }) => {
+    getRequestIdentifier: async (idempotencyKey, request) => {
       const requestPath = new URL(request.url).pathname;
 
       const rawFingerprint = await spec.getFingerprint(request);
@@ -94,27 +94,13 @@ export function createResource(
 /**
  * @internal
  */
-type StorageKeySource = {
-  /**
-   * The `Idempotency-Key` header from the request
-   */
-  idempotencyKey: string;
-  /**
-   * Web-standard request object
-   */
-  request: Request;
-};
-
-/**
- * @internal
- */
 interface IdempotentRequestResource {
-  getRequestIdentifier(source: {
-    idempotencyKey: string;
-    request: Request;
-  }): Promise<RequestIdentifier>;
+  getRequestIdentifier(
+    idempotencyKey: string,
+    request: Request,
+  ): Promise<RequestIdentifier>;
 
-  getStorageKey(source: StorageKeySource): Promise<StorageKey>;
+  getStorageKey(idempotencyKey: string, request: Request): Promise<StorageKey>;
 
   satisfiesKeySpec(idempotencyKey: string): boolean;
 }
