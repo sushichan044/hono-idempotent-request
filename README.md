@@ -1,18 +1,14 @@
 # hono-idempotent-request
 
+> [!WARNING]
+> This library is a work in progress. The API and behavior may change in future releases.
+
 Idempotent request middleware for [Hono](https://hono.dev/), compliant with [IETF draft-ietf-httpapi-idempotency-key-header-07](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07).
 
-## Features
-
-- ✅ **Idempotency-Key Header Support** - Process requests idempotently based on the `Idempotency-Key` header
-- 🔄 **Response Caching** - Cache and reuse responses for requests with the same `Idempotency-Key`
-- 🔒 **Concurrent Request Detection** - Detect and handle concurrent requests with the same `Idempotency-Key`
-- 🔍 **Payload Validation** - Verify request payload consistency using fingerprints
-- 📋 **RFC 7807 Compliant Errors** - Return errors following the Problem Details for HTTP APIs specification
-- 🎯 **Flexible Activation** - Control when idempotency processing is applied
-- 🔧 **Bring Your Own Implementation** - Implement your own storage adapter and server specification
-
 ## Installation
+
+> [!NOTE]
+> Not published yet since it has some known gaps against the draft.
 
 ```bash
 # pnpm
