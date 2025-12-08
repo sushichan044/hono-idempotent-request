@@ -6,6 +6,7 @@ type ResponseType =
   | "key_missing"
   | "key_payload_mismatch"
   | "retrieved_stored_response"
+  | "storage_error"
   | "success";
 
 export type Hooks = {

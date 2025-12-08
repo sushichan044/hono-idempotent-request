@@ -10,6 +10,16 @@ import type { StorageAdapter } from "./types";
 
 import { IdempotencyKeyStorageError } from "../error";
 
+export type FindOrCreateResult =
+  | {
+      created: false;
+      request: IdempotentRequest;
+    }
+  | {
+      created: true;
+      request: UnProcessedIdempotentRequest;
+    };
+
 interface IdempotentRequestStorage {
   /**
    * Complete the request by setting the response and freeing the lock.
@@ -36,16 +46,7 @@ interface IdempotentRequestStorage {
    * - If the request is found, returns `{ created: false, request: IdempotentRequest }`.
    * - If the request is not found, persists a new unprocessed request and returns `{ created: true, request: UnProcessedIdempotentRequest }`.
    */
-  findOrCreate(request: IdempotentRequestBase): Promise<
-    | {
-        created: false;
-        request: IdempotentRequest;
-      }
-    | {
-        created: true;
-        request: UnProcessedIdempotentRequest;
-      }
-  >;
+  findOrCreate(request: IdempotentRequestBase): Promise<FindOrCreateResult>;
 
   /**
    * Acquire a lock for the request.

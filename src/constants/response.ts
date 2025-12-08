@@ -32,12 +32,26 @@ const DEFAULT_DOCUMENTATION_CONFIG = createDocumentationConfig();
  */
 export function createEnhancedErrorResponse(
   config: DocumentationConfig,
-  errorType: keyof DocumentationSections,
+  errorType: "storageError" | keyof DocumentationSections,
   status: number,
   statusText: string,
   title: string,
   detail: string,
 ): SerializedResponse {
+  if (errorType === "storageError") {
+    return {
+      body: JSON.stringify({
+        detail,
+        title,
+      }),
+      headers: {
+        "Content-Type": "application/problem+json",
+      },
+      status,
+      statusText,
+    };
+  }
+
   const documentationUrl = getDocumentationUrl(config, errorType);
 
   return {
@@ -106,3 +120,12 @@ export const IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE =
     "Idempotency-Key is already used",
     "This operation is idempotent and it requires correct usage of Idempotency Key. Idempotency Key MUST not be reused across different payloads of this operation.",
   );
+
+export const REQUEST_UNPROCESSABLE_ERROR_RESPONSE = createEnhancedErrorResponse(
+  DEFAULT_DOCUMENTATION_CONFIG,
+  "storageError",
+  422,
+  "Unprocessable Content",
+  "The request could not be processed",
+  "The request could not be processed due to an internal error.",
+);

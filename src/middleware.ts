@@ -3,8 +3,12 @@ import type { MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 
 import type { Hooks } from "./hooks";
-import type { UnProcessedIdempotentRequest } from "./idempotent-request";
+import type {
+  ProcessingIdempotentRequest,
+  UnProcessedIdempotentRequest,
+} from "./idempotent-request";
 import type { ResourceSpecification } from "./resource";
+import type { FindOrCreateResult } from "./storage";
 import type { StorageAdapter } from "./storage/types";
 import type { IdempotencyActivationStrategy } from "./strategy";
 
@@ -13,8 +17,9 @@ import {
   IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE,
   IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE,
   IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE,
+  REQUEST_UNPROCESSABLE_ERROR_RESPONSE,
 } from "./constants/response";
-import { UnsafeImplementationError } from "./error";
+import { IdempotencyKeyStorageError, UnsafeImplementationError } from "./error";
 import { resolveHooks } from "./hooks";
 import { isIdenticalRequest } from "./identifier";
 import { createResource } from "./resource";
@@ -126,11 +131,22 @@ export function idempotentRequest(
       await cloneRequest(c),
     );
 
-    const storeResult = await storage.findOrCreate({
-      ...requestIdentifier,
-      createdAt: new Date(),
-      storageKey,
-    });
+    let storeResult: FindOrCreateResult;
+    try {
+      storeResult = await storage.findOrCreate({
+        ...requestIdentifier,
+        createdAt: new Date(),
+        storageKey,
+      });
+    } catch (error) {
+      if (error instanceof IdempotencyKeyStorageError) {
+        return await hooks.modifyResponse(
+          deserializeResponse(REQUEST_UNPROCESSABLE_ERROR_RESPONSE),
+          "storage_error",
+        );
+      }
+      throw error;
+    }
 
     let unprocessedRequest: UnProcessedIdempotentRequest;
     if (storeResult.created) {
@@ -163,18 +179,39 @@ export function idempotentRequest(
       unprocessedRequest = storeResult.request;
     }
 
-    const lockedRequest = await storage.lockRequest(unprocessedRequest);
+    let lockedRequest: ProcessingIdempotentRequest;
+    try {
+      lockedRequest = await storage.lockRequest(unprocessedRequest);
+    } catch (error) {
+      if (error instanceof IdempotencyKeyStorageError) {
+        return await hooks.modifyResponse(
+          deserializeResponse(REQUEST_UNPROCESSABLE_ERROR_RESPONSE),
+          "storage_error",
+        );
+      }
+      throw error;
+    }
     await next();
 
     const modifiedResponse = await hooks.modifyResponse(
       c.res.clone(),
       "success",
     );
-    // Even if route handler throws an error, this operation will be executed.
-    await storage.completeRequestAndUnlock(
-      lockedRequest,
-      await cloneAndSerializeResponse(modifiedResponse),
-    );
+    try {
+      // Even if route handler throws an error, this operation will be executed.
+      await storage.completeRequestAndUnlock(
+        lockedRequest,
+        await cloneAndSerializeResponse(modifiedResponse),
+      );
+    } catch (error) {
+      if (error instanceof IdempotencyKeyStorageError) {
+        return await hooks.modifyResponse(
+          deserializeResponse(REQUEST_UNPROCESSABLE_ERROR_RESPONSE),
+          "storage_error",
+        );
+      }
+      throw error;
+    }
 
     return modifiedResponse;
   });
