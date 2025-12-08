@@ -111,6 +111,7 @@ Hooks to modify behavior.
 - `modifyResponse?: (response: Response, type: ResponseType) => Promise<Response> | Response`
 
 Modify the response before it's returned to the client. The `type` parameter indicates why the hook was called:
+
 - `"success"`: Successful request processing
 - `"retrieved_stored_response"`: Cached response returned
 - `"key_conflict"`: Concurrent request detected (409)
