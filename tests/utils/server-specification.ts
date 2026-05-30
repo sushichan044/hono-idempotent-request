@@ -26,9 +26,7 @@ export const createTestResource = (): ResourceSpecification => {
   };
 };
 
-/**
- * Hash function - Generate a hash from the request content
- */
+/** Hash function - Generate a hash from the request content */
 const generateHash = async (request: Request): Promise<string> => {
   // For JSON requests, we should ideally sort keys alphabetically before hashing
   // to ensure semantic equivalence regardless of key order.
@@ -46,9 +44,7 @@ const generateHash = async (request: Request): Promise<string> => {
   return hashWithSha256(JSON.stringify(digestBase));
 };
 
-/**
- * Calculate SHA-256 hash
- */
+/** Calculate SHA-256 hash */
 const hashWithSha256 = (data: string): string => {
   return encodeHexLowerCase(sha256(new TextEncoder().encode(data)));
 };

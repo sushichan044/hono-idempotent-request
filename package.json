@@ -2,88 +2,77 @@
   "name": "hono-idempotent-request",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
   "description": "Idempotent request middleware for Hono, compliant with IETF draft-ietf-httpapi-idempotency-key-header-07",
-  "sideEffects": false,
-  "license": "MIT",
   "keywords": [
+    "api",
     "hono",
-    "middleware",
-    "idempotent",
+    "http",
     "idempotency",
     "idempotency-key",
+    "idempotent",
     "ietf",
-    "http",
-    "api",
+    "middleware",
     "rest"
   ],
   "homepage": "https://github.com/sushichan044/hono-idempotent-request#readme",
   "bugs": {
     "url": "https://github.com/sushichan044/hono-idempotent-request/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sushichan044/hono-idempotent-request.git"
-  },
+  "license": "MIT",
   "author": {
     "name": "sushichan044",
     "url": "https://github.com/sushichan044"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/",
-    "provenance": true
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sushichan044/hono-idempotent-request.git"
   },
   "funding": "https://github.com/sponsors/sushichan044",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "lint": "eslint --max-warnings 0 --fix",
-    "lint:check": "eslint --max-warnings 0",
-    "format": "biome format --write",
-    "format:check": "biome format --reporter=github",
-    "typecheck": "tsgo --noEmit",
-    "test": "vitest --run",
-    "check": "pnpm run format:check && pnpm run typecheck && pnpm run lint:check && pnpm run test && pnpm run build",
-    "build": "tsdown",
-    "prepublishOnly": "pnpm run build",
+    "check": "vp check",
+    "tidy": "vp check --fix",
+    "test": "vp test --run",
+    "build": "vp pack",
     "pkg-pr-new": "pkg-pr-new publish --compact --comment=update --pnpm"
-  },
-  "packageManager": "pnpm@10.22.0",
-  "peerDependencies": {
-    "hono": "^4.0.0"
   },
   "dependencies": {
     "structured-headers": "2.0.2"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:dev",
-    "@biomejs/biome": "catalog:dev",
-    "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
+    "@oslojs/crypto": "1.0.1",
+    "@oslojs/encoding": "1.1.0",
     "@types/node": "catalog:dev",
     "@typescript/native-preview": "catalog:dev",
-    "@virtual-live-lab/eslint-config": "catalog:dev",
     "@virtual-live-lab/tsconfig": "catalog:dev",
-    "@vitest/coverage-v8": "catalog:dev",
-    "eslint": "catalog:dev",
-    "eslint-plugin-import-access": "catalog:dev",
-    "hono": "4.10.6",
     "pkg-pr-new": "catalog:dev",
     "publint": "catalog:dev",
     "release-it": "catalog:dev",
     "release-it-pnpm": "catalog:dev",
-    "tsdown": "catalog:dev",
     "typescript": "catalog:dev",
-    "typescript-eslint": "catalog:dev",
     "unplugin-unused": "catalog:dev",
-    "uuid": "^13.0.0",
-    "vite": "catalog:dev",
-    "vitest": "catalog:dev"
-  }
+    "uuid": "14.0.0",
+    "vite-plus": "catalog:dev"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
+  },
+  "packageManager": "pnpm@11.4.0"
 }

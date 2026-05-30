@@ -1,9 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
-import {
-  createDocumentationConfig,
-  getDocumentationUrl,
-} from "./documentation";
+import { createDocumentationConfig, getDocumentationUrl } from "./documentation";
 
 describe("Documentation Configuration", () => {
   describe("createDocumentationConfig", () => {

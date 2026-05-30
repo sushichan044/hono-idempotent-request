@@ -13,9 +13,7 @@ export type SerializedResponse = {
  * @param response - The response to serialize
  * @returns The serialized response
  */
-export async function cloneAndSerializeResponse(
-  response: Response,
-): Promise<SerializedResponse> {
+export async function cloneAndSerializeResponse(response: Response): Promise<SerializedResponse> {
   const responseClone = response.clone();
   // DO NOT REFERENCE ANY PROPERTIES OF THE ORIGINAL RESPONSE
 

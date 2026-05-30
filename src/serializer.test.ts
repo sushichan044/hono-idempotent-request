@@ -1,7 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import type { SerializedResponse } from "./serializer";
-
 import { cloneAndSerializeResponse, deserializeResponse } from "./serializer";
 
 describe("serializeResponse", () => {
@@ -86,9 +85,7 @@ describe("BodyInit round-trip", () => {
   });
 
   it("should round-trip Blob bodies", async () => {
-    const response = new Response(
-      new Blob(["Hello Blob"], { type: "text/plain" }),
-    );
+    const response = new Response(new Blob(["Hello Blob"], { type: "text/plain" }));
     const serialized = await cloneAndSerializeResponse(response);
     const actualBody = await response.text();
 

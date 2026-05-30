@@ -1,6 +1,6 @@
 /**
- * Documentation configuration for error responses
- * Provides configurable URLs for RFC documentation links
+ * Documentation configuration for error responses Provides configurable URLs for RFC documentation
+ * links
  */
 
 export interface DocumentationSections {
@@ -19,18 +19,14 @@ export interface DocumentationConfig {
   sections: DocumentationSections;
 }
 
-/**
- * Default documentation sections pointing to RFC draft sections
- */
+/** Default documentation sections pointing to RFC draft sections */
 const DEFAULT_SECTIONS: DocumentationSections = {
   keyConflict: "#section-2.7",
   keyMismatch: "#section-2.7",
   keyMissing: "#section-2.7",
 };
 
-/**
- * Default base URL for RFC documentation
- */
+/** Default base URL for RFC documentation */
 const DEFAULT_BASE_URL =
   "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07";
 

@@ -1,16 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-
 import { createMiddleware } from "hono/factory";
-
-import type { Hooks } from "./hooks";
-import type {
-  ProcessingIdempotentRequest,
-  UnProcessedIdempotentRequest,
-} from "./idempotent-request";
-import type { ResourceSpecification } from "./resource";
-import type { FindOrCreateResult } from "./storage";
-import type { StorageAdapter } from "./storage/types";
-import type { IdempotencyActivationStrategy } from "./strategy";
 
 import { cloneRequest } from "./clone-request";
 import {
@@ -20,11 +9,20 @@ import {
   REQUEST_UNPROCESSABLE_ERROR_RESPONSE,
 } from "./constants/response";
 import { IdempotencyKeyStorageError, UnsafeImplementationError } from "./error";
+import type { Hooks } from "./hooks";
 import { resolveHooks } from "./hooks";
+import type {
+  ProcessingIdempotentRequest,
+  UnProcessedIdempotentRequest,
+} from "./idempotent-request";
 import { isIdenticalRequest } from "./identifier";
+import type { ResourceSpecification } from "./resource";
 import { createResource } from "./resource";
 import { cloneAndSerializeResponse, deserializeResponse } from "./serializer";
+import type { FindOrCreateResult } from "./storage";
 import { createStorage } from "./storage";
+import type { StorageAdapter } from "./storage/types";
+import type { IdempotencyActivationStrategy } from "./strategy";
 import { resolveStrategy } from "./strategy";
 import { parseStructuredIdempotencyKey } from "./utils/structured-headers";
 
@@ -32,26 +30,25 @@ export interface IdempotentRequestImplementation {
   /**
    * Strategy for activating idempotency processing
    *
-   * As a string:
-   * - `"always"`: Always apply idempotency processing (default - compliant with draft-07)
-   * - `"opt-in-with-key"`: Apply idempotency processing only if the `Idempotency-Key` header exists
+   * As a string: - `"always"`: Always apply idempotency processing (default - compliant with
+   * draft-07) - `"opt-in-with-key"`: Apply idempotency processing only if the `Idempotency-Key`
+   * header exists
    *
-   * As a function:
-   * - A function that determines whether to apply idempotency processing using custom logic
-   *   - YOU MUST CHECK EXISTENCE OF `Idempotency-Key` HEADER.
-   *   - Useful when you are using strategies like feature flags
-   *   - Return `true` to apply idempotency processing, `false` otherwise
-   *
-   * @default "always"
+   * As a function: - A function that determines whether to apply idempotency processing using
+   * custom logic - YOU MUST CHECK EXISTENCE OF `Idempotency-Key` HEADER. - Useful when you are
+   * using strategies like feature flags - Return `true` to apply idempotency processing, `false`
+   * otherwise
    *
    * @example
-   * ```ts
-   * (req) => {
-   *    return (
-   *     typeof req.headers.get("Idempotency-Key") === "string" &&
-   *     req.headers.get("X-Enable-Idempotency") === "true"
+   *   ```ts
+   *   (req) => {
+   *   return (
+   *   typeof req.headers.get("Idempotency-Key") === "string" &&
+   *   req.headers.get("X-Enable-Idempotency") === "true"
    *   );
-   * };
+   *   };
+   *
+   *   @default "always"
    */
   activationStrategy?: IdempotencyActivationStrategy;
 
@@ -70,16 +67,12 @@ export interface IdempotentRequestImplementation {
    * You should implement features like TTL, cleanup, etc. at this layer.
    */
   storage: {
-    /**
-     * Storage adapter implementation.
-     */
+    /** Storage adapter implementation. */
     adapter: StorageAdapter;
   };
 }
 
-export function idempotentRequest(
-  impl: IdempotentRequestImplementation,
-): MiddlewareHandler {
+export function idempotentRequest(impl: IdempotentRequestImplementation): MiddlewareHandler {
   const strategy = resolveStrategy(impl.activationStrategy ?? "always");
   const hooks = resolveHooks(impl.hooks);
   const resource = createResource(impl.resource);
@@ -116,10 +109,7 @@ export function idempotentRequest(
       );
     }
 
-    const storageKey = await resource.getStorageKey(
-      idempotencyKey,
-      await cloneRequest(c),
-    );
+    const storageKey = await resource.getStorageKey(idempotencyKey, await cloneRequest(c));
     if (!storageKey.includes(idempotencyKey)) {
       throw new UnsafeImplementationError(
         "The storage-key must include the value of the `Idempotency-Key` header.",
@@ -193,10 +183,7 @@ export function idempotentRequest(
     }
     await next();
 
-    const modifiedResponse = await hooks.modifyResponse(
-      c.res.clone(),
-      "success",
-    );
+    const modifiedResponse = await hooks.modifyResponse(c.res.clone(), "success");
     try {
       // Even if route handler throws an error, this operation will be executed.
       await storage.completeRequestAndUnlock(

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { createDocumentationConfig } from "../config/documentation";
 import {
@@ -11,9 +11,10 @@ import {
 describe("Error Response Constants", () => {
   describe("Enhanced Error Responses", () => {
     it("should include type field in missing key error response", () => {
-      const body = JSON.parse(
-        IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.body,
-      ) as Record<string, unknown>;
+      const body = JSON.parse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.body) as Record<
+        string,
+        unknown
+      >;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
         "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
@@ -21,9 +22,10 @@ describe("Error Response Constants", () => {
     });
 
     it("should include type field in conflict error response", () => {
-      const body = JSON.parse(
-        IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.body,
-      ) as Record<string, unknown>;
+      const body = JSON.parse(IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.body) as Record<
+        string,
+        unknown
+      >;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
         "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
@@ -31,9 +33,10 @@ describe("Error Response Constants", () => {
     });
 
     it("should include type field in mismatch error response", () => {
-      const body = JSON.parse(
-        IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE.body,
-      ) as Record<string, unknown>;
+      const body = JSON.parse(IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE.body) as Record<
+        string,
+        unknown
+      >;
       expect(body).toHaveProperty("type");
       expect(body["type"]).toBe(
         "https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.7",
@@ -41,12 +44,14 @@ describe("Error Response Constants", () => {
     });
 
     it("should maintain RFC7807 Problem Details compliance", () => {
-      const missingBody = JSON.parse(
-        IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.body,
-      ) as Record<string, unknown>;
-      const conflictBody = JSON.parse(
-        IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.body,
-      ) as Record<string, unknown>;
+      const missingBody = JSON.parse(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.body) as Record<
+        string,
+        unknown
+      >;
+      const conflictBody = JSON.parse(IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.body) as Record<
+        string,
+        unknown
+      >;
       const mismatchBody = JSON.parse(
         IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE.body,
       ) as Record<string, unknown>;
@@ -59,15 +64,15 @@ describe("Error Response Constants", () => {
       }
 
       // Check Content-Type header
-      expect(
-        IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.headers["Content-Type"],
-      ).toBe("application/problem+json");
-      expect(
-        IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.headers["Content-Type"],
-      ).toBe("application/problem+json");
-      expect(
-        IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE.headers["Content-Type"],
-      ).toBe("application/problem+json");
+      expect(IDEMPOTENCY_KEY_MISSING_ERROR_RESPONSE.headers["Content-Type"]).toBe(
+        "application/problem+json",
+      );
+      expect(IDEMPOTENCY_KEY_CONFLICT_ERROR_RESPONSE.headers["Content-Type"]).toBe(
+        "application/problem+json",
+      );
+      expect(IDEMPOTENCY_KEY_PAYLOAD_MISMATCH_ERROR_RESPONSE.headers["Content-Type"]).toBe(
+        "application/problem+json",
+      );
     });
   });
 

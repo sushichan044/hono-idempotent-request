@@ -1,3 +1,4 @@
+import { IdempotencyKeyStorageError } from "../error";
 import type {
   FulfilledIdempotentRequest,
   IdempotentRequest,
@@ -7,8 +8,6 @@ import type {
 } from "../idempotent-request";
 import type { SerializedResponse } from "../serializer";
 import type { StorageAdapter } from "./types";
-
-import { IdempotencyKeyStorageError } from "../error";
 
 export type FindOrCreateResult =
   | {
@@ -26,10 +25,8 @@ interface IdempotentRequestStorage {
    *
    * This method internally clones the response, So you don't need to clone in caller side.
    *
-   * @param request
-   * The request to set the response and unlock.
-   * @param response
-   * The response to set.
+   * @param request The request to set the response and unlock.
+   * @param response The response to set.
    */
   completeRequestAndUnlock(
     request: ProcessingIdempotentRequest,
@@ -39,34 +36,25 @@ interface IdempotentRequestStorage {
   /**
    * Find or create a request.
    *
-   * @param request
-   * The request to find or create.
-   * @returns
+   * @param request The request to find or create.
+   * @returns - If the request is found, returns `{ created: false, request: IdempotentRequest }`.
    *
-   * - If the request is found, returns `{ created: false, request: IdempotentRequest }`.
-   * - If the request is not found, persists a new unprocessed request and returns `{ created: true, request: UnProcessedIdempotentRequest }`.
+   *   - If the request is not found, persists a new unprocessed request and returns `{ created: true,
+   *     request: UnProcessedIdempotentRequest }`.
    */
   findOrCreate(request: IdempotentRequestBase): Promise<FindOrCreateResult>;
 
   /**
    * Acquire a lock for the request.
    *
-   * @param request
-   * The request to acquire a lock for.
-   * @returns
-   * The locked request.
+   * @param request The request to acquire a lock for.
+   * @returns The locked request.
    */
-  lockRequest(
-    request: UnProcessedIdempotentRequest,
-  ): Promise<ProcessingIdempotentRequest>;
+  lockRequest(request: UnProcessedIdempotentRequest): Promise<ProcessingIdempotentRequest>;
 }
 
-/**
- * @internal
- */
-export function createStorage(
-  adapter: StorageAdapter,
-): IdempotentRequestStorage {
+/** @internal */
+export function createStorage(adapter: StorageAdapter): IdempotentRequestStorage {
   return {
     lockRequest: async (request) => {
       try {

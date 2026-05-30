@@ -1,8 +1,7 @@
-import { describe, expect, it } from "vitest";
-
-import type { RequestIdentifier } from "./identifier";
+import { describe, expect, it } from "vite-plus/test";
 
 import { createIdempotencyFingerprint } from "./brand";
+import type { RequestIdentifier } from "./identifier";
 import { isIdenticalRequest } from "./identifier";
 
 describe("isIdenticalRequest", () => {

@@ -1,19 +1,13 @@
 import type { IdempotencyFingerprint } from "./brand";
 
 export type RequestIdentifier = {
-  /**
-   * Request method
-   */
+  /** Request method */
   requestMethod: string;
 
-  /**
-   * Request path
-   */
+  /** Request path */
   requestPath: string;
 
-  /**
-   * `Idempotency-Key` header value
-   */
+  /** `Idempotency-Key` header value */
   idempotencyKey: string;
 
   /**

@@ -5,19 +5,13 @@ import { parseItem, serializeItem } from "structured-headers";
  *
  * Its value MUST be a String (Section 3.3.3 of [RFC8941]).
  *
- * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.1 2.1. Syntax - draft-ietf-httpapi-idempotency-key-header-07}
- *
- * @see {@link https://datatracker.ietf.org/doc/html/rfc8941#section-3.3.3 3.3.3. Strings - RFC8941}
- *
- * @param rawIdempotencyKey
- *  The raw Idempotency-Key header value.
- *  `null` means the value is invalid and could not be parsed.
- *
+ * @param rawIdempotencyKey The raw Idempotency-Key header value. `null` means the value is invalid
+ *   and could not be parsed.
  * @returns The parsed Idempotency-Key value.
+ * @see {@link https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header-07#section-2.1 2.1. Syntax - draft-ietf-httpapi-idempotency-key-header-07}
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc8941#section-3.3.3 3.3.3. Strings - RFC8941}
  */
-export function parseStructuredIdempotencyKey(
-  rawIdempotencyKey: string,
-): string | null {
+export function parseStructuredIdempotencyKey(rawIdempotencyKey: string): string | null {
   try {
     const [parsed] = parseItem(serializeItem(rawIdempotencyKey));
     if (typeof parsed === "string") {

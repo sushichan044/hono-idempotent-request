@@ -95,9 +95,9 @@ Controls when idempotency processing is applied.
 - `(request: Request) => boolean | Promise<boolean>`: Custom function to determine activation
 
 ```typescript
-activationStrategy: "opt-in-with-key"
+activationStrategy: "opt-in-with-key";
 // or
-activationStrategy: (request) => request.method === "POST"
+activationStrategy: (request) => request.method === "POST";
 ```
 
 #### `hooks` (optional)
@@ -123,7 +123,7 @@ hooks: {
       response.headers.set("X-Idempotent-Replayed", "true");
     }
     return response;
-  }
+  };
 }
 ```
 

@@ -1,22 +1,13 @@
-import {
-  afterEach,
-  assert,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, assert, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
+import { createStorageKey } from "../brand";
+import { IdempotencyKeyStorageError } from "../error";
 import type {
   FulfilledIdempotentRequest,
   ProcessingIdempotentRequest,
   UnProcessedIdempotentRequest,
 } from "../idempotent-request";
 import type { SerializedResponse } from "../serializer";
-
-import { createStorageKey } from "../brand";
-import { IdempotencyKeyStorageError } from "../error";
 import { createStorage } from "./index";
 
 const mocks = vi.hoisted(() => ({

@@ -25,7 +25,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
@@ -34,16 +34,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Setup Node.js and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-        with:
-          registry-url: "https://registry.npmjs.org"
+      - uses: ./.github/actions/setup-env
+
+      - run: pnpm run build
 
       - name: Setup latest npm to use trusted publish
         run: |
           npm install -g npm@latest
 
-      - name: Release
-        run: pnpm exec release-it
+      - run: pnpm exec release-it
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

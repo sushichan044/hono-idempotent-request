@@ -1,30 +1,23 @@
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { ResourceSpecification } from "./resource";
-import type { StorageAdapter } from "./storage/types";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createInMemoryAdapter } from "../tests/utils/in-memory-adapter";
 import { createTestResource } from "../tests/utils/server-specification";
 import { idempotentRequest } from "./middleware";
+import type { ResourceSpecification } from "./resource";
+import type { StorageAdapter } from "./storage/types";
 
 describe("idempotentRequest Middleware", () => {
-  function createTestApp(options?: {
-    spec?: ResourceSpecification;
-    storage?: StorageAdapter;
-  }) {
-    const {
-      spec: resource = createTestResource(),
-      storage: adapter = createInMemoryAdapter(),
-    } = options ?? {};
+  function createTestApp(options?: { spec?: ResourceSpecification; storage?: StorageAdapter }) {
+    const { spec: resource = createTestResource(), storage: adapter = createInMemoryAdapter() } =
+      options ?? {};
 
     const app = new Hono()
       .use(
         "*",
         idempotentRequest({
-          activationStrategy: (request) =>
-            ["PATCH", "POST"].includes(request.method),
+          activationStrategy: (request) => ["PATCH", "POST"].includes(request.method),
           resource,
           storage: {
             adapter,
@@ -83,10 +76,7 @@ describe("idempotentRequest Middleware", () => {
       const json = (await response.json()) as Record<string, string>;
 
       const cachedResponse = await app.request("/api/test", createRequest());
-      const cachedJson = (await cachedResponse.json()) as Record<
-        string,
-        string
-      >;
+      const cachedJson = (await cachedResponse.json()) as Record<string, string>;
 
       expect(cachedResponse.status).toBe(response.status);
       expect(cachedJson["message"]).toBe(json["message"]);
@@ -111,8 +101,7 @@ describe("idempotentRequest Middleware", () => {
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchObject({
-        detail:
-          "This operation is idempotent and it requires correct usage of Idempotency Key.",
+        detail: "This operation is idempotent and it requires correct usage of Idempotency Key.",
         title: "Idempotency-Key is missing",
       });
     });
@@ -132,8 +121,7 @@ describe("idempotentRequest Middleware", () => {
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchObject({
-        detail:
-          "This operation is idempotent and it requires correct usage of Idempotency Key.",
+        detail: "This operation is idempotent and it requires correct usage of Idempotency Key.",
         title: "Idempotency-Key is missing",
       });
     });
@@ -205,8 +193,7 @@ describe("idempotentRequest Middleware", () => {
       const memoryAdapter = createInMemoryAdapter();
       const waitOnServer = 100; //ms
       const waitOnClient = waitOnServer / 2;
-      const sleep = async (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms));
+      const sleep = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
       const app = new Hono<{ Bindings: { simulateSlow: boolean } }>()
         .use(

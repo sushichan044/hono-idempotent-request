@@ -10,10 +10,7 @@ type ResponseType =
   | "success";
 
 export type Hooks = {
-  modifyResponse: (
-    response: Response,
-    type: ResponseType,
-  ) => Awaitable<Response>;
+  modifyResponse: (response: Response, type: ResponseType) => Awaitable<Response>;
 };
 
 export const resolveHooks = (userHooks: Partial<Hooks> = {}): Hooks => {

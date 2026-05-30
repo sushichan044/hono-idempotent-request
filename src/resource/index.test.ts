@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createResource } from "./index";
 
@@ -31,10 +31,7 @@ describe("IdempotentRequestResource", () => {
     it("should return RequestIdentifier with fingerprint when getFingerprint returns a value", async () => {
       stubSpecification.getFingerprint.mockResolvedValue("test-fingerprint");
 
-      const identifier = await resource.getRequestIdentifier(
-        idempotencyKey,
-        request,
-      );
+      const identifier = await resource.getRequestIdentifier(idempotencyKey, request);
 
       expect(identifier).toEqual({
         fingerprint: "test-fingerprint",
@@ -47,10 +44,7 @@ describe("IdempotentRequestResource", () => {
     it("should return RequestIdentifier with null fingerprint when getFingerprint returns null", async () => {
       stubSpecification.getFingerprint.mockResolvedValue(null);
 
-      const identifier = await resource.getRequestIdentifier(
-        idempotencyKey,
-        request,
-      );
+      const identifier = await resource.getRequestIdentifier(idempotencyKey, request);
 
       expect(identifier).toStrictEqual({
         fingerprint: null,
@@ -67,10 +61,7 @@ describe("IdempotentRequestResource", () => {
 
       const storageKey = await resource.getStorageKey(idempotencyKey, request);
 
-      expect(stubSpecification.getStorageKey).toHaveBeenCalledWith(
-        idempotencyKey,
-        request,
-      );
+      expect(stubSpecification.getStorageKey).toHaveBeenCalledWith(idempotencyKey, request);
       expect(storageKey).toBe("test-storage-key");
     });
   });

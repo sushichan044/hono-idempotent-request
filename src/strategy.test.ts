@@ -1,12 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import type { IdempotencyActivationStrategy } from "./strategy";
-
 import { resolveStrategy } from "./strategy";
 
-const createMockRequest = (
-  definedHeaders: Record<string, string> = {},
-): Request => {
+const createMockRequest = (definedHeaders: Record<string, string> = {}): Request => {
   const headers = new Headers(definedHeaders);
 
   return new Request("http://example.com", {
@@ -40,9 +37,7 @@ describe("prepareActivationStrategy", () => {
   });
 
   it("should return the function as is when strategy is a function", async () => {
-    const strategy = resolveStrategy(
-      (req) => req.headers.get("X-Enable-Idempotency") === "true",
-    );
+    const strategy = resolveStrategy((req) => req.headers.get("X-Enable-Idempotency") === "true");
 
     const mockRequestWithHeader = createMockRequest({
       "x-enable-idempotency": "true",
@@ -55,8 +50,8 @@ describe("prepareActivationStrategy", () => {
 
   it("should throw an error when strategy is invalid", () => {
     const invalidStrategy = "invalid-strategy";
-    expect(() =>
-      resolveStrategy(invalidStrategy as IdempotencyActivationStrategy),
-    ).toThrow(`Invalid activation strategy: ${invalidStrategy}`);
+    expect(() => resolveStrategy(invalidStrategy as IdempotencyActivationStrategy)).toThrow(
+      `Invalid activation strategy: ${invalidStrategy}`,
+    );
   });
 });

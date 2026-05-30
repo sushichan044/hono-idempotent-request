@@ -11,9 +11,7 @@ export type IdempotentRequestBase = Readonly<
      */
     storageKey: StorageKey;
 
-    /**
-     * Creation time of the request record
-     */
+    /** Creation time of the request record */
     createdAt: Date;
   }
 >;
@@ -28,8 +26,8 @@ export type UnProcessedIdempotentRequest = IdempotentRequestBase &
     /**
      * Time when the request was locked for processing
      *
-     * This is used to prevent race conditions when multiple requests are
-     * trying to process the same request concurrently.
+     * This is used to prevent race conditions when multiple requests are trying to process the same
+     * request concurrently.
      */
     lockedAt: null;
 
@@ -41,8 +39,8 @@ export type ProcessingIdempotentRequest = IdempotentRequestBase &
     /**
      * Time when the request was locked for processing
      *
-     * This is used to prevent race conditions when multiple requests are
-     * trying to process the same request concurrently.
+     * This is used to prevent race conditions when multiple requests are trying to process the same
+     * request concurrently.
      */
     lockedAt: Date;
 
@@ -54,8 +52,8 @@ export type FulfilledIdempotentRequest = IdempotentRequestBase &
     /**
      * Time when the request was locked for processing
      *
-     * This is used to prevent race conditions when multiple requests are
-     * trying to process the same request concurrently.
+     * This is used to prevent race conditions when multiple requests are trying to process the same
+     * request concurrently.
      */
     lockedAt: null;
 
